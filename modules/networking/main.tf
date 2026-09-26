@@ -96,5 +96,5 @@ resource "aws_security_group" "pe_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags          = local.name_tag
+  tags = local.name_tag
 }

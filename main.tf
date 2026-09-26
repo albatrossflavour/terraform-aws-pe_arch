@@ -4,22 +4,24 @@ terraform {
   required_providers {
     hiera5 = {
       source  = "chriskuchin/hiera5"
-      version = "0.3.0"
+      version = "0.5.4"
     }
     aws = {
       source  = "hashicorp/aws"
-      version = "5.20.1"
+      version = "6.66.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = "3.1.0"
+      version = "3.9.1"
     }
   }
 }
 
 # Sets the variables that'll be interpolated to determine where variables are
-# located in the hierarchy
+# located in the hierarchy. The config path is explicit because hiera5 0.4.0
+# and later default to hiera.yml, which does not exist in this module.
 provider "hiera5" {
+  config = "${path.module}/hiera.yaml"
   scope = {
     architecture = var.architecture
     replica      = var.replica

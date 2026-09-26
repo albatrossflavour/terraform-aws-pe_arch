@@ -47,7 +47,7 @@ Types of things you'll be paying your cloud provider for
 * [AWS CLI installed](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
 * [AWS Credentials configured](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
 * [Git Installed](https://git-scm.com/downloads)
-* [Terraform (>= 0.13.0) Installed](https://www.terraform.io/downloads.html)
+* [OpenTofu (>= 1.5) or Terraform (>= 1.5) Installed](https://opentofu.org/docs/intro/install/)
 
 ### Beginning with aws-pe_arch
 

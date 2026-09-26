@@ -55,7 +55,7 @@ variable "image_product_code" {
 }
 variable "tags" {
   description = "A map of tags to apply to provisioned resources"
-  type        = map
+  type        = map(any)
 }
 variable "node_count" {
   description = "The quantity of nodes that are deployed within the environment for testing"

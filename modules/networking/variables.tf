@@ -2,15 +2,15 @@
 # properly and do not have any defaults set because this submodule should never
 # be called from anything else expect the main module where values for all these
 # variables will always be passed in
-variable id {
+variable "id" {
   description = "Randomly generated value used to produce unique names for everything"
   type        = string
 }
-variable allow {
+variable "allow" {
   description = "List of permitted IP subnets"
   type        = list(string)
 }
-variable project {
+variable "project" {
   description = "The name of the PE deployment project to tag resources with"
 }
 variable "to_create" {

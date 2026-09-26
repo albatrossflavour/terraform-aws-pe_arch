@@ -38,7 +38,7 @@ variable "instance_image" {
 }
 variable "tags" {
   description = "A map of tags to apply to provisioned resources"
-  type        = map
+  type        = map(any)
   default     = {}
 }
 variable "architecture" {

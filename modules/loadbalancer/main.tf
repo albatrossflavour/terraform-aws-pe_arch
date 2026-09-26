@@ -12,7 +12,7 @@ resource "aws_lb" "pe_compiler_service" {
   internal                         = local.internal
   subnets                          = var.subnet_ids
   load_balancer_type               = "network"
-  enable_cross_zone_load_balancing = true 
+  enable_cross_zone_load_balancing = true
   idle_timeout                     = 400
 }
 

@@ -39,15 +39,15 @@ locals {
     description = "PEADM Deployed Puppet Enterprise"
     project     = var.project
   }, var.tags)
-  servers = [ for i in flatten([
+  servers = [for i in flatten([
     aws_instance.server[*],
     aws_instance.psql[*],
     aws_instance.compiler[*],
     aws_instance.node[*]
-  ]) :
-    [ i.id,
-    var.domain_name == null ? i.private_dns :
-    "${i.tags["Name"]}.${var.domain_name}" ]
+    ]) :
+    [i.id,
+      var.domain_name == null ? i.private_dns :
+    "${i.tags["Name"]}.${var.domain_name}"]
   ]
 }
 
@@ -76,7 +76,7 @@ resource "aws_instance" "server" {
   key_name               = aws_key_pair.pe_adm.key_name
   subnet_id              = var.subnet_ids[count.index % length(var.subnet_ids)]
   vpc_security_group_ids = var.security_group_ids
-  tags                   = merge(local.tags, tomap({
+  tags = merge(local.tags, tomap({
     "Name" = "pe-server-${count.index}-${var.id}"
   }))
 
@@ -95,15 +95,15 @@ resource "aws_instance" "server" {
 # that extra large currently also means "with replica", we deploy two identical
 # hosts in extra large but nothing in the other two architectures
 resource "aws_instance" "psql" {
-  ami                    = data.aws_ami.ami.id
-  instance_type          = var.database_type
+  ami           = data.aws_ami.ami.id
+  instance_type = var.database_type
   # count is used to effectively "no-op" this resource in the event that we
   # deploy any architecture other than xlarge
   count                  = var.database_count
   key_name               = aws_key_pair.pe_adm.key_name
   subnet_id              = var.subnet_ids[count.index % length(var.subnet_ids)]
   vpc_security_group_ids = var.security_group_ids
-  tags                   = merge(local.tags, tomap({
+  tags = merge(local.tags, tomap({
     "Name" = "pe-psql-${count.index}-${var.id}"
   }))
 
@@ -123,15 +123,15 @@ resource "aws_instance" "psql" {
 # extra large but only ever zero can be deployed when the operating mode is set
 # to standard
 resource "aws_instance" "compiler" {
-  ami                    = data.aws_ami.ami.id
-  instance_type          = var.compiler_type
+  ami           = data.aws_ami.ami.id
+  instance_type = var.compiler_type
   # count is used to effectively "no-op" this resource in the event that we
   # deploy the standard architecture
   count                  = var.compiler_count
   key_name               = aws_key_pair.pe_adm.key_name
   subnet_id              = var.subnet_ids[count.index % length(var.subnet_ids)]
   vpc_security_group_ids = var.security_group_ids
-  tags                   = merge(local.tags, tomap({
+  tags = merge(local.tags, tomap({
     "Name" = "pe-compiler-${count.index}-${var.id}"
   }))
 
@@ -154,7 +154,7 @@ resource "aws_instance" "node" {
   key_name               = aws_key_pair.pe_adm.key_name
   subnet_id              = var.subnet_ids[count.index % length(var.subnet_ids)]
   vpc_security_group_ids = var.security_group_ids
-  tags                   = merge(local.tags, tomap({
+  tags = merge(local.tags, tomap({
     "Name" = "pe-node-${count.index}-${var.id}"
   }))
 
