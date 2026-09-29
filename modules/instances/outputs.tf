@@ -8,3 +8,12 @@ output "compilers" {
   value       = var.compiler_count == 0 ? aws_instance.server[*] : aws_instance.compiler[*]
   description = "Depending on architecture, either the primary master or the group of compilers created by the module for use by other modules"
 }
+output "hosts" {
+  value = var.domain_name == null ? {} : {
+    for idx, i in local.instances : local.role_names[idx] => {
+      private_ip = i.private_ip
+      public_ip  = i.public_ip
+    }
+  }
+  description = "Private and public addresses by role name, empty unless domain_name is set"
+}

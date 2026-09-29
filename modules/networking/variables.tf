@@ -10,6 +10,10 @@ variable "allow" {
   description = "List of permitted IP subnets"
   type        = list(string)
 }
+variable "operator_ports" {
+  description = "TCP ports reachable from the allowed subnets"
+  type        = list(number)
+}
 variable "project" {
   description = "The name of the PE deployment project to tag resources with"
 }

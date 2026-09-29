@@ -70,17 +70,25 @@ resource "aws_route_table_association" "pe_subnet_public" {
 # be restricted to organization allowed subnets
 resource "aws_security_group" "pe_sg" {
   name        = "pe-${var.id}"
-  description = "Allow TLS inbound traffic"
+  description = "PE nodes: operator ports from allowed ranges, anything within the VPC"
   vpc_id      = local.vpc_id
 
-  ingress {
-    description = "General ingress rule"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1" # all protocols and ports
-    cidr_blocks = var.allow
+  # Only the ports an operator needs, and only from the allowed ranges: SSH for
+  # Bolt, the console, and the APIs PE's client tools talk to
+  dynamic "ingress" {
+    for_each = length(var.allow) == 0 ? [] : var.operator_ports
+    content {
+      description = "Operator access on ${ingress.value}"
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = var.allow
+    }
   }
 
+  # Nodes, agents and the load balancer's health checks all come from inside the
+  # VPC. The NLB has no security group of its own, so this can't be narrowed to
+  # a self-reference
   ingress {
     description = "Anything from VPC"
     from_port   = 0

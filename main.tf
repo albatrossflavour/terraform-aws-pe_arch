@@ -76,7 +76,7 @@ resource "random_id" "deployment" {
 
 # Repeated and computed values used by component modules
 locals {
-  allowed            = concat(["10.128.0.0/9"], var.firewall_allow)
+  allowed            = var.firewall_allow
   compiler_count     = data.hiera5_bool.has_compilers.value ? var.compiler_count : 0
   id                 = random_id.deployment.hex
   has_lb             = var.disable_lb ? false : data.hiera5_bool.has_compilers.value ? true : false
@@ -89,12 +89,15 @@ locals {
 
 # Contain all the networking configuration for readability
 module "networking" {
-  source    = "./modules/networking"
-  id        = local.id
-  project   = var.project
-  allow     = local.allowed
-  to_create = local.create_network
-  subnet    = var.subnet
+  source  = "./modules/networking"
+  id      = local.id
+  project = var.project
+  allow   = local.allowed
+  # SSH, console, and the APIs used by PE's client tools: RBAC (4433),
+  # orchestrator (8143), Code Manager (8170) and PuppetDB queries (8081)
+  operator_ports = [22, 443, 4433, 8081, 8143, 8170]
+  to_create      = local.create_network
+  subnet         = var.subnet
 }
 
 # Contain all the loadbalancer configuration for readability
@@ -138,4 +141,17 @@ module "instances" {
   primary_disk       = data.hiera5.primary_disk.value
   database_disk      = data.hiera5.database_disk.value
   domain_name        = var.domain_name
+}
+
+# Private and, given a public zone, public records for every node
+module "dns" {
+  source         = "./modules/dns"
+  id             = local.id
+  vpc_id         = module.networking.vpc_id
+  domain_name    = var.domain_name
+  public_zone_id = var.public_zone_id
+  hosts          = module.instances.hosts
+  has_lb         = local.has_lb
+  lb_dns_name    = try(module.loadbalancer.lb_alias.dns_name, null)
+  lb_zone_id     = try(module.loadbalancer.lb_alias.zone_id, null)
 }

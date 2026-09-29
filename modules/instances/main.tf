@@ -39,15 +39,26 @@ locals {
     description = "PEADM Deployed Puppet Enterprise"
     project     = var.project
   }, var.tags)
-  servers = [for i in flatten([
+
+  # Role names used for certnames when a domain is given. They follow the
+  # resource order below and are built from the counts, so they are known at
+  # plan time. server[0] is the primary and server[1], when present, its replica
+  role_names = concat(
+    [for i in range(var.server_count) : i == 0 ? "primary-1" : "replica-${i}"],
+    [for i in range(var.database_count) : "postgres-${i + 1}"],
+    [for i in range(var.compiler_count) : "compiler-${i + 1}"],
+    [for i in range(var.node_count) : "agent-${i + 1}"],
+  )
+  instances = flatten([
     aws_instance.server[*],
     aws_instance.psql[*],
     aws_instance.compiler[*],
     aws_instance.node[*]
-    ]) :
+  ])
+  servers = [for idx, i in local.instances :
     [i.id,
       var.domain_name == null ? i.private_dns :
-    "${i.tags["Name"]}.${var.domain_name}"]
+    "${local.role_names[idx]}.${var.domain_name}"]
   ]
 }
 
@@ -84,9 +95,17 @@ resource "aws_instance" "server" {
     ignore_changes = [tags["internalDNS"]]
   }
 
+  # IMDSv2 only, set here so it doesn't depend on the AMI's defaults
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+  }
+
   root_block_device {
     volume_size = var.primary_disk
-    volume_type = "gp2"
+    volume_type = "gp3"
+    encrypted   = true
   }
 }
 
@@ -111,9 +130,17 @@ resource "aws_instance" "psql" {
     ignore_changes = [tags["internalDNS"]]
   }
 
+  # IMDSv2 only, set here so it doesn't depend on the AMI's defaults
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+  }
+
   root_block_device {
     volume_size = var.database_disk
-    volume_type = "gp2"
+    volume_type = "gp3"
+    encrypted   = true
   }
 }
 
@@ -139,9 +166,17 @@ resource "aws_instance" "compiler" {
     ignore_changes = [tags["internalDNS"]]
   }
 
+  # IMDSv2 only, set here so it doesn't depend on the AMI's defaults
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+  }
+
   root_block_device {
     volume_size = var.compiler_disk
-    volume_type = "gp2"
+    volume_type = "gp3"
+    encrypted   = true
   }
 }
 
@@ -162,8 +197,16 @@ resource "aws_instance" "node" {
     ignore_changes = [tags["internalDNS"]]
   }
 
+  # IMDSv2 only, set here so it doesn't depend on the AMI's defaults
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+  }
+
   root_block_device {
     volume_size = 15
-    volume_type = "gp2"
+    volume_type = "gp3"
+    encrypted   = true
   }
 }

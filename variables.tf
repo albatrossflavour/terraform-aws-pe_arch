@@ -91,3 +91,8 @@ variable "domain_name" {
   type        = string
   default     = null
 }
+variable "public_zone_id" {
+  description = "Existing public Route 53 zone for domain_name. Nodes' public addresses are published there when set"
+  type        = string
+  default     = null
+}
