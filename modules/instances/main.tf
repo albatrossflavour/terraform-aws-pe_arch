@@ -92,7 +92,8 @@ resource "aws_instance" "server" {
   }))
 
   lifecycle {
-    ignore_changes = [tags["internalDNS"]]
+    # A newer image is for new builds only, never a reason to replace a node
+    ignore_changes = [tags["internalDNS"], ami]
   }
 
   # IMDSv2 only, set here so it doesn't depend on the AMI's defaults
@@ -127,7 +128,8 @@ resource "aws_instance" "psql" {
   }))
 
   lifecycle {
-    ignore_changes = [tags["internalDNS"]]
+    # A newer image is for new builds only, never a reason to replace a node
+    ignore_changes = [tags["internalDNS"], ami]
   }
 
   # IMDSv2 only, set here so it doesn't depend on the AMI's defaults
@@ -163,7 +165,8 @@ resource "aws_instance" "compiler" {
   }))
 
   lifecycle {
-    ignore_changes = [tags["internalDNS"]]
+    # A newer image is for new builds only, never a reason to replace a node
+    ignore_changes = [tags["internalDNS"], ami]
   }
 
   # IMDSv2 only, set here so it doesn't depend on the AMI's defaults
@@ -194,7 +197,8 @@ resource "aws_instance" "node" {
   }))
 
   lifecycle {
-    ignore_changes = [tags["internalDNS"]]
+    # A newer image is for new builds only, never a reason to replace a node
+    ignore_changes = [tags["internalDNS"], ami]
   }
 
   # IMDSv2 only, set here so it doesn't depend on the AMI's defaults

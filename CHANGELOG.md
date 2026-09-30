@@ -9,6 +9,10 @@
 - Split-horizon DNS when `domain_name` is set. A private Route 53 zone attached to the VPC holds every node's private address, and `puppet.<domain_name>` points at the compiler load balancer (an alias record) or, without one, the primary. Set `public_zone_id` to an existing public zone for the domain and the nodes' public addresses are published there too. `puppet` stays private: the load balancer is internal and agents sit inside the VPC.
 - With `domain_name` set, certnames describe roles instead of carrying the deployment ID: `primary-1`, `replica-1`, `postgres-1` and `postgres-2`, `compiler-N` and `agent-N`. The `console` output becomes `primary-1.<domain_name>` and `pool` becomes `puppet.<domain_name>`, which pecdm passes to peadm as the compiler pool address, so it lands in the primary's and compilers' `dns_alt_names`. Names no longer change between builds, so only one deployment per domain.
 
+### Fixed
+
+- A newer AMI matching `instance_image` no longer replaces running nodes. The instances look the image up with `most_recent = true` and didn't ignore changes to it, so the next plan after a new release (AlmaLinux publishes regularly) proposed replacing every node in the deployment.
+
 ### Security
 
 - The security group no longer opens every port to `firewall_allow`. Those ranges now reach only SSH (22), the console (443), RBAC (4433), PuppetDB queries (8081), orchestrator (8143) and Code Manager (8170). Traffic from within the VPC is still unrestricted, because the NLB has no security group and its health checks come from VPC addresses.
