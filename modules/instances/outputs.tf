@@ -17,3 +17,7 @@ output "hosts" {
   }
   description = "Private and public addresses by role name, empty unless domain_name is set"
 }
+output "key_name" {
+  value       = aws_key_pair.pe_adm.key_name
+  description = "EC2 key pair holding the operator's SSH public key"
+}

@@ -4,6 +4,7 @@
 
 ### Added
 
+- Outputs for layers built beside the deployment: `vpc_id`, `subnet_ids`, `security_group_id`, `private_zone_id`, `public_zone_id`, `domain_name`, `deployment_id` and `key_name`.
 - `operator_ports` sets which TCP ports `firewall_allow` can reach. The default is the previous fixed list (22, 443, 4433, 8081, 8143, 8170). Every node shares one security group, so an added port is open on all of them.
 - Split-horizon DNS when `domain_name` is set. A private Route 53 zone attached to the VPC holds every node's private address, and `puppet.<domain_name>` points at the compiler load balancer (an alias record) or, without one, the primary. Set `public_zone_id` to an existing public zone for the domain and the nodes' public addresses are published there too. `puppet` stays private: the load balancer is internal and agents sit inside the VPC.
 - With `domain_name` set, certnames describe roles instead of carrying the deployment ID: `primary-1`, `replica-1`, `postgres-1` and `postgres-2`, `compiler-N` and `agent-N`. The `console` output becomes `primary-1.<domain_name>` and `pool` becomes `puppet.<domain_name>`, which pecdm passes to peadm as the compiler pool address, so it lands in the primary's and compilers' `dns_alt_names`. Names no longer change between builds, so only one deployment per domain.
