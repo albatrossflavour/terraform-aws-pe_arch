@@ -89,13 +89,11 @@ locals {
 
 # Contain all the networking configuration for readability
 module "networking" {
-  source  = "./modules/networking"
-  id      = local.id
-  project = var.project
-  allow   = local.allowed
-  # SSH, console, and the APIs used by PE's client tools: RBAC (4433),
-  # orchestrator (8143), Code Manager (8170) and PuppetDB queries (8081)
-  operator_ports = [22, 443, 4433, 8081, 8143, 8170]
+  source         = "./modules/networking"
+  id             = local.id
+  project        = var.project
+  allow          = local.allowed
+  operator_ports = var.operator_ports
   to_create      = local.create_network
   subnet         = var.subnet
 }

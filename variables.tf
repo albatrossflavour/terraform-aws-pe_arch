@@ -96,3 +96,8 @@ variable "public_zone_id" {
   type        = string
   default     = null
 }
+variable "operator_ports" {
+  description = "TCP ports reachable from firewall_allow. The default is SSH, the console, and the APIs PE's client tools use: RBAC (4433), PuppetDB queries (8081), orchestrator (8143) and Code Manager (8170)"
+  type        = list(number)
+  default     = [22, 443, 4433, 8081, 8143, 8170]
+}
